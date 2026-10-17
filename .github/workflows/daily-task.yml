@@ -1,0 +1,33 @@
+name: BiliBiliToolPro Daily Task
+
+on:
+  workflow_dispatch: # 允许你手动点击运行
+  schedule:
+    - cron: '00 08 * * *' # 每天 UTC+8 6:00 自动运行
+
+env:
+  Ray_BiliBiliCookies__1: ${{secrets.COOKIESTR}}
+  # 如果你有多个账号，在这里加上 COOKIESTR2，COOKIESTR3 等
+
+jobs:
+  run-daily-task:
+    runs-on: ubuntu-latest
+    steps:
+    # 设置服务器时区为东八区 
+    - name: Set time zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+    # 检出代码
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+ 
+    # 运行任务
+    - name: Run BiliBiliTool
+      run: |
+        cd ./src/Ray.BiliBiliTool.Console
+        dotnet run --runTasks=Daily
